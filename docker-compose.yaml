@@ -1,0 +1,35 @@
+version: "3.9"
+services:
+  database:
+    image: mongodb/mongodb-community-server:6.0-ubi8
+    container_name: db
+    restart: always
+    environment:
+      - MONGO_INITDB_DATABASE=db
+      - MONGO_INITDB_ROOT_USERNAME=user
+      - MONGO_INITDB_ROOT_PASSWORD=password
+    ports:
+      - "27017:27017"
+    networks:
+      - db-network
+    volumes:
+      - ./data/db:/data/db
+  application:
+    container_name: request-manager-app
+    image: request-manager-app:latest
+    build:
+      dockerfile: Dockerfile
+    environment:
+      - TELEGRAM_BOT_TOKEN=<CHANGE IT>
+      - TELEGRAM_BOT_USERNAME=<CHANGE IT>
+      - TELEGRAM_BOT_CHATID=<CHANGE IT>
+    ports:
+      - 8081:8080
+    depends_on:
+      - database
+    networks:
+      - db-network
+
+networks:
+  db-network:
+    driver: bridge
